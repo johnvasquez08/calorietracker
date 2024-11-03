@@ -26,7 +26,7 @@ export default function Form( {dispatch, state}: FormProps) {
         const isNumberField = ['category', 'calorias'].includes(e.target.id)
         setActivity({
             ...activity,
-            [e.target.id] : isNumberField ? +e.target.value : e.target.value
+            [e.target.id] : isNumberField ?  (e.target.value === '' ? '' : +e.target.value) : e.target.value
         })
     }
 
