@@ -1,14 +1,27 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import {v4 as uuidv4} from 'uuid'
 import { categories } from "../data/categories"
 import { Activity } from "../types"
+import { ActivityActions, ActivityState } from "../reducers/activityReducer"
 
-
-export default function Form() {
-    const [activity, setActivity] = useState<Activity>({
+type FormProps = {
+    dispatch: React.Dispatch<ActivityActions>
+    state: ActivityState
+}
+export default function Form( {dispatch, state}: FormProps) {
+    const initialState : Activity = {
+        id: uuidv4(),
         category :1,
-         name :'', 
+         name :'',
          calorias : 0
-    })
+    }
+    useEffect(() => {
+        if (state.activeID) {
+            const activeActivity = state.activities.filter(activity => activity.id === state.activeID)[0]
+            setActivity(activeActivity)
+        }
+    }, [state.activeID])
+    const [activity, setActivity] = useState<Activity>(initialState)
     const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const isNumberField = ['category', 'calorias'].includes(e.target.id)
         setActivity({
@@ -23,7 +36,9 @@ export default function Form() {
     }
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault()
-        console.log("Submit")
+        setActivity({...initialState, 
+            id:uuidv4()})
+        dispatch({type: 'save-activity', payload: {newActivity: activity}})
     }
 
   return (
@@ -53,7 +68,7 @@ export default function Form() {
 
             </div>
             <div className="grid grid-cols-1 gap-3">
-                <label htmlFor="calorias" className="font-bold">Atividad</label>
+                <label htmlFor="calorias" className="font-bold">Calorias</label>
                 <input type="number" name="calorias" id="calorias" className="border border-slate-400 rounded-lg p-2 w-full"
                 placeholder="Calorias: 200, 300, 500"
                 value={activity.calorias}
